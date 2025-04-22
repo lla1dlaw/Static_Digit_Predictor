@@ -1,0 +1,202 @@
+@import url('https://fonts.googleapis.com/css2?family=Tourney:wdth@125&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tourney:ital,wdth@1,125&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* tags */
+
+:root {
+    --cyan: #0fb1bd;
+    --background: #1f252e;
+}
+
+body {
+    background-color: var(--background);
+    margin: 0;
+}
+
+a {
+    text-decoration: none;
+}
+
+
+/* ids */
+
+#app-container {
+    display: flex;
+    flex-direction: row;
+    padding: 100px 50px;
+}
+
+#canvas-title-container {
+    display: flex;
+    flex-direction: row;
+}
+
+#graphic-container {
+    float: left; 
+}
+
+#prediction-container {
+    display: flex;
+    flex-direction: column;
+    float: right;
+    margin-left: 50px;
+    align-items: center;
+}
+
+#prediction-label {
+    float: left;
+    text-decoration: underline;
+    text-decoration-thickness: .05em;
+    text-underline-offset: 0.3em;
+    margin-bottom: 1rem;
+}
+
+#prediction-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+    margin-inline: auto;
+    aspect-ratio: 1/1;
+    border: .15em solid var(--cyan);
+    border-radius: 1em;
+}
+
+#prediction {
+    font-size: 4rem;
+}
+
+#network-container {
+    flex-grow: 1;
+}
+
+#network-canvas {
+    width: 100%;
+    height: 100%;
+}
+
+#canvas-buttons-container {
+    display: flex;
+    width: 100%;
+}
+
+#draw-prompt {
+    display: flex; 
+    float: left;
+}
+
+#select-network-type {
+    text-align: left;
+    padding: 0;
+}
+
+
+#draw-prompt {
+    margin-bottom: 10px;
+}
+
+#canvas {
+    display: block;
+    border: 5px solid;
+    border-color: var(--cyan);
+    border-radius: 5px;
+    background-color: white;
+}
+
+#header-container {
+    display: flex;
+    flex-direction: column;
+    margin-left: 50px;
+    margin-top: 50px;
+}
+
+#page-title, #page-subtitle, #about-link, #draw-prompt, #prediction-label, #prediction{
+    color: 	var(--cyan);
+}
+
+#page-title {
+    float: left;
+    text-decoration: underline;
+    text-decoration-thickness: .05em;
+    text-underline-offset: 0.3em;
+}
+
+#page-subtitle { 
+    display: flex;
+    float: left;
+    margin-top: 10px;
+}
+
+#about-link {
+    display: flex;
+    float: right;
+    margin-right: 100px;
+    padding: 5px 10px;
+    border: 2px solid;
+    border-color: var(--cyan);
+    border-radius: 5px;
+}
+
+#clear-button {
+    margin-left: 0;
+}
+
+/* classes */ 
+
+.canvas-button:hover {
+    background-color: #D3D3D3;
+}
+
+.canvas-button {
+    background-color: white; /* Green */
+    border: none;
+    color: black;
+    padding: 8px 15px;
+    text-align: center;
+    text-decoration: none;
+    margin-inline: 2.5px;
+    margin-top: 5px; 
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    float: left;
+}
+
+
+/* fonts */
+
+.roboto-regular {
+    margin: 0;
+    padding: 0;
+    font-family: "Roboto", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
+    font-variation-settings:
+      "wdth" 100;
+  }
+
+
+.tourney-italic {
+    margin: 0;
+    padding: 0;
+    font-family: "Tourney", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: italic;
+    font-variation-settings:
+      "wdth" 125;
+  }
+
+.tourney-regular {
+    margin: 0;
+    padding: 0;
+    font-family: "Tourney", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 900;
+    font-style: normal;
+    font-variation-settings:
+      "wdth" 125;
+  }
+  
