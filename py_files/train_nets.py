@@ -124,8 +124,8 @@ def print_and_save(model, dimensions: list[int] = None, is_cnn: bool = False):
 
 def load_save_all_state_dicts():
     # get file format for save
-    format =  pyip.inputMenu([".pt", ".onnx"], prompt="Choose format:", numbered=True)
-    load_dir = os.path.join("models")
+    format =  pyip.inputMenu([".pt", ".onnx"], prompt="Choose format:\n", numbered=True)
+    load_dir = os.path.join("model_dicts")
     save_dir = os.path.join(f"model_dicts({format})")
     os.makedirs(save_dir, exist_ok=True)
     model = None
@@ -134,15 +134,25 @@ def load_save_all_state_dicts():
         # get file paths
         model_load_path = os.path.join(load_dir, filename)
         filename_no_ext = os.path.splitext(filename)[0]
-        model_save_path = os.path.join(save_dir, f"{filename_no_ext}-dict{format}")
+        model_save_path = os.path.join(save_dir, f"{filename_no_ext}{format}")
 
         # load model and save its dicts (uses cpu becuase it is unknown)
-        model: nn.Module = torch.load(model_load_path, map_location=device, weights_only=False)
+        if not "cnn" in filename:
+            input_size = 28*28
+            num_classes = 10
+            widths = [int(width) for width in filename_no_ext.rstrip("-dict").split("-")]
+            model = NeuralNet(input_size, widths, num_classes).to(device)
+        else:
+            model = CNN().to(device)
+            model.load_state_dict(torch.load(model_load_path, weights_only=True))
+
         model.eval()
         if format == ".pt":
             torch.save(model.state_dict(), model_save_path)
         elif format == ".onnx":
-            torch.onnx.
+            dummy_input = torch.randn(1, 1, 28, 28).to(device) if isinstance(model, CNN) else torch.randn(1, 784).to(device)
+            onnx_model = torch.onnx.export(model, dummy_input, dynamo=True, optimize=False, fallback=True, export_params=True, input_names=['input'], output_names=['output'])
+            onnx_model.save(model_save_path)
 
 
 def load_data(batch_size: int):
@@ -205,8 +215,6 @@ def main():
     print("\n----------Welcome to the MNIST Neural Network Trainer----------\n")
     print("- This program trains a feed forward neural network on the MNIST dataset.")
     print("- Use the following prompts to train and save your models.\n")
-
-    print(Loader("model_dicts", device=device, from_dicts=True).models)
 
 
     # hyperparameters

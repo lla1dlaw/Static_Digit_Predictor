@@ -2,7 +2,7 @@ backports.tarfile
 importlib-metadata
 jaraco.collections
 matplotlib
-onnx
+onnxscript
 opencv-python
 platformdirs
 pretty-errors
