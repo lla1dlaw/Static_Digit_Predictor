@@ -1,0 +1,12 @@
+backports.tarfile
+importlib-metadata
+jaraco.collections
+matplotlib
+onnx
+opencv-python
+platformdirs
+pretty-errors
+pyinputplus
+tomli
+torchvision
+tqdm

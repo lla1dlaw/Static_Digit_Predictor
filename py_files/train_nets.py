@@ -4,6 +4,7 @@ Filename: train_nets.py
 Purpose: Trains and saves various types of torch based neural networks through an interactive CLI. 
 """
 #Feed Forward Neural Network Trained and Tested on MNIST dataset
+from cmd import PROMPT
 import os
 from matplotlib.pylab import f
 import torch
@@ -122,8 +123,10 @@ def print_and_save(model, dimensions: list[int] = None, is_cnn: bool = False):
 
 
 def load_save_all_state_dicts():
+    # get file format for save
+    format =  pyip.inputMenu([".pt", ".onnx"], prompt="Choose format:", numbered=True)
     load_dir = os.path.join("models")
-    save_dir = os.path.join("model_dicts")
+    save_dir = os.path.join(f"model_dicts({format})")
     os.makedirs(save_dir, exist_ok=True)
     model = None
 
@@ -131,12 +134,15 @@ def load_save_all_state_dicts():
         # get file paths
         model_load_path = os.path.join(load_dir, filename)
         filename_no_ext = os.path.splitext(filename)[0]
-        model_save_path = os.path.join(save_dir, f"{filename_no_ext}-dict.pt")
+        model_save_path = os.path.join(save_dir, f"{filename_no_ext}-dict{format}")
 
         # load model and save its dicts (uses cpu becuase it is unknown)
         model: nn.Module = torch.load(model_load_path, map_location=device, weights_only=False)
         model.eval()
-        torch.save(model.state_dict(), model_save_path)
+        if format == ".pt":
+            torch.save(model.state_dict(), model_save_path)
+        elif format == ".onnx":
+            torch.onnx.
 
 
 def load_data(batch_size: int):
