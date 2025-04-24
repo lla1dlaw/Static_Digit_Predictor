@@ -1,4 +1,8 @@
 
+import * as ort from 'onnxruntime-web';
+import * as fs from 'fs';
+import * as path from 'path';
+
 class rgb{
     /**
      * Converts a hexedicimal string into rgb values
@@ -43,7 +47,7 @@ class Node {
 }
 
 
-class NetworkVisualizer {
+class Network {
     /**
      * A visual respresentation of a network based on its name (ex. '10-10-10'). More activated nodes are brighter shade of the node color. 
      * @param {string} name - The name of the network. Note: This parameter defines its dimensions.
