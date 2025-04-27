@@ -56,7 +56,7 @@ class Network {
      * @param {HTMLCanvasElement} canvas - The canvas to draw the visualization to. 
      * @param {CanvasRenderingContext2D} canvasContext - The rendering context for the associated canvas. . 
      */
-    constructor(name, path,  canvas, canvasContext, nodeColor="#FF5733") {
+    constructor(name, path, canvas, canvasContext, nodeColor="#FF5733") {
         this.name = name;
         this.path = path;
         this.canvas = canvas;
@@ -174,23 +174,67 @@ class NetworkManager {
         this.canvasContext = this.canvas.getContext('2d');
         this.canvasContext = canvasContext;
         models = loadModels();
+        this.currentModel = null;
     }
 
     loadModels() {
-        const models = [];
+        const models = {};
         try {
-        const modelFiles = fs.readdirSync(models_dir);
+            const modelFiles = fs.readdirSync(models_dir);
 
-        modelFiles.forEach(file => {
-            const filePath = path.join(this.modelsDir, file);
-            model = new Network()
-        });
-    } catch (error) {
-        console.error(`Error loading models from ${this.modelsDir}:`, error);
-        return null;
+            modelFiles.forEach(file => {
+
+                const filePath = path.join(this.modelsDir, file);
+                model = new Network(file, filePath, this.canvas, this.canvasContext)
+                models[file] = model; // add model to object
+            });
+
+            return models;
+        } catch (error) {
+            console.error(`Error loading models from ${this.modelsDir}:`, error);
+            return null;
+        }
     }
 
+    setCurrentModel(modelName) {
+        if (this.models[modelName]) {
+            this.currentModel = this.models[modelName];
+        } else {
+            console.error(`Model ${modelName} not found.`);
+        }
     }
+
+    drawNetwork(modelName) {
+        setCurentModel(modelName);
+        this.currentModel.drawNetwork();
+    }
+
+    getInference(data) {
+        if (!this.currentModel) {
+            console.error("No model selected.");
+            return null;
+        }
+        return this.currentModel.getInference(data);
+    }
+
+    /**
+     * Changes the current model, and wipes the network canvas. 
+     * @param {string} modelName the name of the model to change to. 
+     */
+    changeCurrentModel(modelName) {
+        this.setCurrentModel(modelName);
+        this.canvasContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.currentModel.drawNetwork();
+    }
+
+
+    /**
+     * Displays the activations from the last inference on the currently selected network.
+     */
+    displayActivations() {
+        
+    }
+
 }
 
 
