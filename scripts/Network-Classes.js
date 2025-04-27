@@ -51,12 +51,14 @@ class Network {
     /**
      * A visual respresentation of a network based on its name (ex. '10-10-10'). More activated nodes are brighter shade of the node color. 
      * @param {string} name - The name of the network. Note: This parameter defines its dimensions.
+     * @param {string} path - The path to the network onnx file.
      * @param {string} nodeColor - Hex color for the displayed nodes.
      * @param {HTMLCanvasElement} canvas - The canvas to draw the visualization to. 
      * @param {CanvasRenderingContext2D} canvasContext - The rendering context for the associated canvas. . 
      */
-    constructor(name,  canvas, canvasContext, nodeColor="#FF5733") {
+    constructor(name, path,  canvas, canvasContext, nodeColor="#FF5733") {
         this.name = name;
+        this.path = path;
         this.canvas = canvas;
         this.canvasContext = canvasContext;
         this.layers = name.split("-").forEach(element => parseInt(element));// turn name into integer layer counts
@@ -66,6 +68,14 @@ class Network {
         this.radius = this.calcNodeRadius();
         this.layerGap = width/numLayers - (this.radius * numLayers * 2); // Gap to leave between layers
         this.nodes = generateNodes();
+        this.model = loadModel(path);
+
+        // input dims 
+        if ("cnn" in this.name) {
+            this.inputDims = [1, 1, 28, 28];
+        } else {
+            this.inputDims = [1, 784];
+        }
     }
 
     calcNodeRadius() {
@@ -97,14 +107,70 @@ class Network {
         return nodes;
     }
 
-    drawBlankNetwork() {
-        return none;
+    draw() {
+        this.canvasContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.nodes.forEach(node => {
+            this.canvasContext.beginPath();
+            this.canvasContext.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+            this.canvasContext.fillStyle = node.color.toHex();
+            this.canvasContext.fill();
+            this.canvasContext.closePath();
+        });
+    }
+    drawEdges() {
+        this.nodes.forEach(node => {
+            this.canvasContext.beginPath();
+            this.canvasContext.moveTo(node.x, node.y);
+            this.canvasContext.lineTo(node.x + this.layerGap, node.y);
+            this.canvasContext.strokeStyle = this.edgeColor;
+            this.canvasContext.stroke();
+            this.canvasContext.closePath();
+        });
+    }
+    drawNetwork() {
+        this.draw();
+        this.drawEdges();
     }
 
-    applyActivations() {
-        return none;
+    /**
+     * Loads the network from a file. 
+     * @param {string} filePath - The path to the file. 
+     */
+    async loadModel(filePath) {
+        try {
+            return await ort.InferenceSession.create(filepath);
+        } catch (error) {
+            console.error(`Error Loading model ${this.name} from ${filePath}:`, error);
+            return null;
+        }
     }
 
+
+    /**
+     * Runs inference on the network. 
+     * @param {Array} data - Image data to run through the network
+     * @returns {int} - The index of the most activated node (infered digit).
+     */
+    async getInference(data) {
+        const inputTensor = new ort.Tensor('float32', data, this.inputDims);
+        if (this.inputDims )
+        await this.model.run({ input: inputTensor }).then(output => {
+            const outputTensor = output.values().next().value;
+            const outputData = outputTensor.data;
+            const maxIndex = outputData.indexOf(Math.max(...outputData));
+            return maxIndex;
+        }).catch(error => {
+            console.error(`Error running inference on model ${this.name}:`, error);
+            return null;
+        });
+    }
+}
+
+class NetworkManager {
+
+    constructor(models_dir) {
+        
+    }
 }
 
 
