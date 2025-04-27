@@ -168,8 +168,28 @@ class Network {
 
 class NetworkManager {
 
-    constructor(models_dir) {
-        
+    constructor(modelsDir, canvas) {
+        this.modelsDir = modelsDir
+        this.canvas = canvas;
+        this.canvasContext = this.canvas.getContext('2d');
+        this.canvasContext = canvasContext;
+        models = loadModels();
+    }
+
+    loadModels() {
+        const models = [];
+        try {
+        const modelFiles = fs.readdirSync(models_dir);
+
+        modelFiles.forEach(file => {
+            const filePath = path.join(this.modelsDir, file);
+            model = new Network()
+        });
+    } catch (error) {
+        console.error(`Error loading models from ${this.modelsDir}:`, error);
+        return null;
+    }
+
     }
 }
 
