@@ -30,7 +30,7 @@ const select = document.getElementById("select-network-type");
 const networkCanvas = document.getElementById("network-canvas");
 const predictionText = document.getElementById("prediction");
 const networkContext = networkCanvas.getContext('2d', { willReadFrequently: true });
-
+const netManager = new NetworkManager("../onnx_models/", networkCanvas);
 
 let canvasData;
 let grayScaleImage;
@@ -55,7 +55,6 @@ function displayNewNetwork() {
     const layers = layers_as_strings.map(num => parseInt(num)); // cast string layers to integers
     
     predictionText.textContent = "";
-
 }
 
 async function getInference() {
@@ -72,17 +71,13 @@ async function getInference() {
     // send query
     canvasData = context.getImageData(0, 0, canvas.width, canvas.height).data;
     grayScaleImage = processImageVector(canvasData);
-    body = JSON.stringify({
-        "model": selected_net,
-        "image": grayScaleImage
-    });
+
     // request prediction from backend
-    pred_info = await sendInferenceQuery(body); // includes prediction and layer activations
+    pred_info = netManager.getInference(grayScaleImage); // will include prediction and layer activations after models are altered to include them
     const prediction = pred_info['prediction'];
-    const activations = pred_info['activations'];
+    const activations = pred_info['activations']; // returns [0] for now
 
     // draw network activations
-
 
     // reset predict button styling and enable it
     predictButton.style.background = "white";
@@ -94,26 +89,7 @@ async function getInference() {
 }
 
 
-async function sendInferenceQuery(body) {
-    url = "/infer";
-    let response;
-
-    try {
-        console.log("Sending Request to backend")
-        response = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json"},
-            body: body
-        });
-        return response.json();
-    
-    } catch (error) {
-        console.error(error.message);
-    }
-}
-
-
-async function addNetworkOptions() {
+function addNetworkOptions() {
 
     // clear network select menu elements and add placeholder option
     select.innerHTML = ''; // ensure select tag is empty
@@ -122,22 +98,9 @@ async function addNetworkOptions() {
     placeHolder.text = "Select Model";
     placeHolder.class = "roboto-regular";
     select.appendChild(placeHolder);
-    // gets a list of available model architechtures from the MNISTPredictor microservice
-    url = "/get_available_networks";
-    let available_networks;
-
-    try {
-        const response = await fetch(url);
-        if (!response.ok){
-            throw new Error(`Response status: ${response.status}`);
-        }
-
-        available_networks = await response.json();
-    } catch (error) {
-        console.error(error.message);
-    }
-
-    console.log(typeof available_networks);
+    
+    // TODO: get available networks from network manager object
+    const available_networks = netManager.getAvailableNetworks();
     // populate select with available options from microservice
     available_networks.forEach(option => {
         const e = document.createElement('option');

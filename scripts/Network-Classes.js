@@ -1,6 +1,6 @@
 
-import * as ort from 'onnxruntime-web';
 import * as fs from 'fs';
+import * as ort from 'onnxruntime-web';
 import * as path from 'path';
 
 class rgb{
@@ -164,6 +164,11 @@ class Network {
             return null;
         });
     }
+
+    // ------------ fix this after adjusting onnx models ------------------
+    getActivations() {
+        return [0];
+    }
 }
 
 class NetworkManager {
@@ -214,7 +219,10 @@ class NetworkManager {
             console.error("No model selected.");
             return null;
         }
-        return this.currentModel.getInference(data);
+        return { 
+            'prediction' : this.currentModel.getInference(data),
+            'activations' : this.currentModel.getActivations() 
+        };
     }
 
     /**
@@ -227,12 +235,15 @@ class NetworkManager {
         this.currentModel.drawNetwork();
     }
 
-
     /**
      * Displays the activations from the last inference on the currently selected network.
      */
     displayActivations() {
         
+    }
+
+    getAvailableNetworks() {
+        return Object.keys(this.models);
     }
 
 }
