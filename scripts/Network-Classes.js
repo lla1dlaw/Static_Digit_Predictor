@@ -138,7 +138,7 @@ class Network {
      */
     async loadModel(filePath) {
         try {
-            return await ort.InferenceSession.create(filepath);
+            return await ort.InferenceSession.create(filePath);
         } catch (error) {
             console.error(`Error Loading model ${this.name} from ${filePath}:`, error);
             return null;
@@ -210,7 +210,7 @@ class NetworkManager {
     }
 
     drawNetwork(modelName) {
-        setCurentModel(modelName);
+        setCurrentModel(modelName);
         this.currentModel.drawNetwork();
     }
 
@@ -249,3 +249,4 @@ class NetworkManager {
 }
 
 
+export default NetworkManager;

@@ -4,7 +4,7 @@
 // Purpose: Allows user to draw on included canvas element
 // Note: This is an introductory javascript project; comments may be verbose/redundant and are intended to emphasize understanding of functionality
 //       rather than to serve as pure documentation.
-
+import NetworkManager from './Network-Classes.js';
 
 // make sure window is loaded
 window.addEventListener('load', () => {
@@ -25,8 +25,7 @@ let draw = false; // draw lines to canvas
 const canvas = document.querySelector('#canvas');
 const context = canvas.getContext('2d', { willReadFrequently: true }); // context for 2d canvas operations
 const clearButton = document.querySelector('#clear-button');
-const predictButton = document.querySelector('#predict-button');
-const select = document.getElementById("select-network-type");
+const selectNetworkMenu = document.getElementById("select-network-type");
 const networkCanvas = document.getElementById("network-canvas");
 const predictionText = document.getElementById("prediction");
 const networkContext = networkCanvas.getContext('2d', { willReadFrequently: true });
@@ -40,15 +39,14 @@ let savedWidth;
 let savedHeight;
 
 canvas.addEventListener('mousedown', startDrawing);
-canvas.addEventListener('mouseup', stopDrawing);
+canvas.addEventListener('mouseup', stopDrawingPredict);
 canvas.addEventListener('mousemove', drawCanvas);
 clearButton.addEventListener('click', clearCanvas);
-predictButton.addEventListener('click', getInference);
-select.addEventListener('change', displayNewNetwork)
+selectNetworkMenu.addEventListener('change', displayNewNetwork)
 
 // ------------- functions --------------
 function displayNewNetwork() {
-    const layers_string = select.value;
+    const layers_string = selectNetworkMenu.value;
     if (layers_string == "") { return; } // ensure that a network has been selected
 
     const layers_as_strings = layers_string.split("-")
@@ -58,16 +56,12 @@ function displayNewNetwork() {
 }
 
 async function getInference() {
-    const selected_net = select.value;
+    const selected_net = selectNetworkMenu.value;
     if (selected_net == "") { // if the user hasn't selected a network...
-        predictButton.disabled = false;
-        predictButton.style.background = "#ff6961";
+        selectNetworkMenu.style.background = "#ff6961";
         return;
     }
-    // set button styling anbd enable the button
-    predictButton.disabled = true;
-    predictButton.style.background = "#77DD77";
-    predictButton.style.cursor = "default"
+
     // send query
     canvasData = context.getImageData(0, 0, canvas.width, canvas.height).data;
     grayScaleImage = processImageVector(canvasData);
@@ -92,23 +86,23 @@ async function getInference() {
 function addNetworkOptions() {
 
     // clear network select menu elements and add placeholder option
-    select.innerHTML = ''; // ensure select tag is empty
+    selectNetworkMenu.innerHTML = ''; // ensure select tag is empty
     const placeHolder = document.createElement('option');
     placeHolder.value = "";
     placeHolder.text = "Select Model";
     placeHolder.class = "roboto-regular";
-    select.appendChild(placeHolder);
+    selectNetworkMenu.appendChild(placeHolder);
     
     // TODO: get available networks from network manager object
     const available_networks = netManager.getAvailableNetworks();
-    // populate select with available options from microservice
+    // populate selectNetworkMenu with available options from microservice
     available_networks.forEach(option => {
         const e = document.createElement('option');
         e.value = option;
         e.text = option;
         e.class = "roboto-regular";
         e.id = option;
-        select.appendChild(e);
+        selectNetworkMenu.appendChild(e);
     });
 }
 
@@ -163,8 +157,10 @@ function startDrawing(mouseEvent) {
 }
 
 
-function stopDrawing() {
+function stopDrawingPredict() {
     draw = false;
+    getInference();
+
 }
 
 
